@@ -36,9 +36,9 @@ CRGB leds[NUM_LEDS];
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { white, rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
+SimplePatternList gPatterns = { white, rainbow, rainbowWithGlitter, confetti, sinelon, blackout };
 
-uint8_t brightness = 150;
+uint8_t brightness = 200;
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 
@@ -83,9 +83,9 @@ void loop()
 
 void handleSpin(ESPRotary& r) {
   if( r.getDirection() == 1 ) {
-    brightness = min(255, brightness-2);
+    brightness = max(1, brightness-3);
   } else {
-    brightness = max(1, brightness+2);
+    brightness = min(255, brightness+3);
   }
   FastLED.setBrightness(brightness);
   Serial.println(brightness);
@@ -144,27 +144,6 @@ void sinelon()
   leds[pos] += CHSV( gHue, 255, 192);
 }
 
-void bpm()
-{
-  // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
-  uint8_t BeatsPerMinute = 62;
-  CRGBPalette16 palette = PartyColors_p;
-  uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
-  for( int i = 0; i < NUM_LEDS; i++) { //9948
-    leds[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10));
-  }
-}
-
-void juggle() {
-  // eight colored dots, weaving in and out of sync with each other
-  fadeToBlackBy( leds, NUM_LEDS, 20);
-  byte dothue = 0;
-  for( int i = 0; i < 8; i++) {
-    leds[beatsin16( i+7, 0, NUM_LEDS-1 )] |= CHSV(dothue, 200, 255);
-    dothue += 32;
-  }
-}
-
-void off() {
+void blackout() {
   fadeToBlackBy( leds, NUM_LEDS, 20);
 }
